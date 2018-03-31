@@ -1,11 +1,11 @@
-import { Problem } from "./models/problem.model";
 
-export const PROBLEMS: Problem[] = [
+import { Problem } from './models/problem.model';
+
+export const PROBLEMS : Problem[] = [
   {
     id: 1,
     name: "Two Sum",
     desc: `Given an array of integers, find two numbers such that they add up to a specific target number.
-
 The function twoSum should return indices of the two numbers such that they add up to the target, where index1 must be less than index2. Please note that your returned answers (both index1 and index2) are NOT zero-based.`,
     difficulty: "easy"
   },
@@ -19,7 +19,6 @@ The function twoSum should return indices of the two numbers such that they add 
     id: 3,
     name: "4Sum",
     desc: `Given an array S of n integers, are there elements a, b, c, and d in S such that a + b + c + d = target?
-
 Find all unique quadruplets in the array which gives the sum of target.`,
     difficulty: "medium"
   },

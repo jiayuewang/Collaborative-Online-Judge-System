@@ -1,6 +1,6 @@
 import { OjClientPage } from './app.po';
 
-describe('oj-client App', function() {
+describe('oj-client App', () => {
   let page: OjClientPage;
 
   beforeEach(() => {

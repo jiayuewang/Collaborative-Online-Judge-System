@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-MAINTAINER Chan Mao
+MAINTAINER Ting-Hsuan Lin
 
 RUN apt-get update
 RUN apt-get install -y gcc

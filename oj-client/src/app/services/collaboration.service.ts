@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-
 import { COLORS } from '../../assets/colors';
 
 declare var io: any;
@@ -7,67 +6,69 @@ declare var ace: any;
 
 @Injectable()
 export class CollaborationService {
-
   collaborationSocket: any;
   clientsInfo: Object = {};
-  clientNum: number = 0;
+  clientsNum: number = 0;
 
   constructor() { }
+  init(editor:any, sessionID:string): void{
+  	this.collaborationSocket = io(window.location.origin,
+  									{query: 'sessionID=' + sessionID});
+  	//console.log(sessionID);
 
-  init(editor: any, sessionId: string): void {
-    this.collaborationSocket = io(window.location.origin, { query: 'sessionId=' + sessionId });
 
-    this.collaborationSocket.on("change", (delta: string) => {
-      console.log('collaboration: editor changes by ' + delta);
-      delta = JSON.parse(delta);
-      editor.lastAppliedChange = delta;
-      editor.getSession().getDocument().applyDeltas([delta]);
-    });
+  	//change from server
+  	this.collaborationSocket.on('change', (changeInEditor: string) => {
+  		console.log("Collaboration service: editor changes" + changeInEditor);
+  		changeInEditor = JSON.parse(changeInEditor);
+  		editor.lastAppliedChange = changeInEditor;
+  		editor.getSession().getDocument().applyDeltas([changeInEditor]);
+  	});
 
-    this.collaborationSocket.on("cursorMove", (cursor) => {
-      console.log("cursor move: " + cursor);
-      let session = editor.getSession();
+    //cursor move event from server
+    this.collaborationSocket.on('cursorMove', (cursor: string) => {
+      //cursor = {row:xxx, col:xxx, socketID:xxx}
+      console.log("Coolaboration service: cursor moves " + cursor);
       cursor = JSON.parse(cursor);
-      let x = cursor['row'];
-      let y = cursor['column'];
-      let changeClientId = cursor['socketId'];
-      console.log(x + ' ' + y + ' ' + changeClientId);
+      let x = cursor["row"];
+      let y = cursor["column"];
+      let changeClientID = cursor["socketID"];
 
-      if (changeClientId in this.clientsInfo) {
-        session.removeMarker(this.clientsInfo[changeClientId]['marker']);
-      } else {
-        this.clientsInfo[changeClientId] = {};
-
+      let session = editor.getSession();
+      //remove old marker or new this client
+      if(changeClientID in this.clientsInfo){
+        session.removeMarker(this.clientsInfo[changeClientID]['marker']);
+      }else{
+        this.clientsInfo[changeClientID] = {};
         let css = document.createElement("style");
-        css.type = "text/css";
-        css.innerHTML = ".editor_cursor_" + changeClientId
-            + " { position:absolute; background:" + COLORS[this.clientNum] + ";"
-            + " z-index: 100; width:3px !important; }";
-
+        css.type = 'text/css';
+        css.innerHTML = '.editorCursor_'+changeClientID + 
+                        '{position:absolute; background:' + COLORS[this.clientsNum] + ';' +
+                        'z-index:100; width: 2px !important;}';
         document.body.appendChild(css);
-        this.clientNum++;
+        this.clientsNum += 1;
       }
-
+      //draw a new marker
       let Range = ace.require('ace/range').Range;
-      let newMarker = session.addMarker(new Range(x, y, x, y + 1), 'editor_cursor_' + changeClientId, true);
-      this.clientsInfo[changeClientId]['marker'] = newMarker;
+      let newMarker = session.addMarker(new Range(x, y, x, y+1),
+                                        'editorCursor_'+changeClientID,
+                                        true);
+      this.clientsInfo[changeClientID]['marker'] = newMarker;
     });
-
-    // Test
-    this.collaborationSocket.on("message", (message) => {
-      console.log("received: " + message);
-    })
   }
 
-  change(delta: string): void {
-    this.collaborationSocket.emit("change", delta);
+
+  change(changeInEditor: string): void{
+    //client change the editor
+  	this.collaborationSocket.emit('change', changeInEditor);
   }
 
-  cursorMove(cursor : string): void {
-    this.collaborationSocket.emit("cursorMove", cursor);
+  cursorMove(cursor: string): void{
+    //client's cursor move
+    this.collaborationSocket.emit('cursorMove', cursor);
   }
 
-  restoreBuffer(): void {
-    this.collaborationSocket.emit("restoreBuffer");
+  restoreBuffer(): void{
+    this.collaborationSocket.emit('restoreBuffer');
   }
 }
