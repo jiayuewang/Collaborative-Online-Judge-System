@@ -85,3 +85,50 @@ Redis, Memcached, Dynamo...
 
 ● Document databases
 MongoDB, CouchDB... XML, JSON, BSON...
+
+
+Create a RESTful API server with NodeJS and Express
+
+Feature: user can GET and POST problems from server using RESTful API
+
+Steps:
+
+1. Initialize oj-server and install Express
+
+2. Create server.js to handle the server-side routing
+
+3. Create rest.js to handle GET /api/v1/problems request
+
+4. Create problemService.js to read/write the problem data
+
+5. Handle GET /api/v1/problems/:id and POST /api/v1/problems requests
+
+6. Test with Postman
+7. 
+
+Feature: user can add a new problem to the problem list.
+
+Component: new-problem
+
+
+Feature: user can see a Bootstrap style navigation bar on top of all pages. Component: navbar Bootstrap navbar template
+
+
+
+Integrate MongoDB
+
+mLab: cloud-hosted MongoDB
+
+Mongoose:
+
+a JavaScript wrapper for MongoDB API.
+
+Refactor oj-server/services/problemService.js
+
+Connect oj-client and oj-server
+
+1. Refactor client-side data service to async Promise: single value Observable: value stream
+
+2. Move /public folder outside /oj-client
+
+3. Send static web pages from server to browser ● Note to forward all unhandled url request to clientside routing(not done)
